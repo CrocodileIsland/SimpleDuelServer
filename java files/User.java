@@ -129,12 +129,12 @@ public class User {
     String steam = "";
     String duel_links = "";
     JSONObject song = new JSONObject();
-    ArrayList<Friend> friends_arr = new ArrayList<Friend>();
+    //ArrayList<Friend> friends_arr = new ArrayList<Friend>();
     ArrayList<String> pics = new ArrayList<String>();
     ArrayList<Integer> ids = new ArrayList<Integer>();
     ArrayList<Integer> nsfws = new ArrayList<Integer>();
-    ArrayList<Comment> comments = new ArrayList<Comment>();
-    ArrayList<Comment> testimonials = new ArrayList<Comment>();
+    //ArrayList<Comment> comments = new ArrayList<Comment>();
+    //ArrayList<Comment> testimonials = new ArrayList<Comment>();
     ArrayList<Timestamp> previous_calls = new ArrayList<Timestamp>();
     
     Boolean updateBlocked = true;
@@ -386,12 +386,12 @@ public class User {
         steam = "";
         duel_links = "";
         song = new JSONObject();
-        friends_arr.clear();
+        //friends_arr.clear();
         pics.clear();
         ids.clear();
         nsfws.clear();
-        comments.clear();
-        testimonials.clear();
+        //comments.clear();
+        //testimonials.clear();
         previous_calls.clear();
 
         updateBlocked = true;

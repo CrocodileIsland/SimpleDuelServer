@@ -38,10 +38,10 @@ public class DataHandler {
     public static ArrayList<Duel> RecycledDuels = new ArrayList<Duel>();
     public static ArrayList<Player> RecycledPlayers = new ArrayList<Player>();
     public static ArrayList<Message> RecycledMessages = new ArrayList<Message>();
-    public static ArrayList<Status> RecycledStatuses = new ArrayList<Status>();
-    public static ArrayList<JournalEntry> RecycledJournalEntries = new ArrayList<JournalEntry>();
+    //public static ArrayList<Status> RecycledStatuses = new ArrayList<Status>();
+    //public static ArrayList<JournalEntry> RecycledJournalEntries = new ArrayList<JournalEntry>();
     public static ArrayList<DuelEntry> RecycledDuelEntries = new ArrayList<DuelEntry>();
-    public static ArrayList<Friend> RecycledFriends = new ArrayList<Friend>();
+    //public static ArrayList<Friend> RecycledFriends = new ArrayList<Friend>();
     public static ArrayList<Watcher> RecycledWatchers = new ArrayList<Watcher>();
     public static ArrayList<User> DuelRoom = new ArrayList<User>();
     public static ArrayList<Call> Calls = new ArrayList<Call>();
@@ -49,18 +49,18 @@ public class DataHandler {
     public static ArrayList<Integer> GoatFormatLimits = new ArrayList<Integer>();
     public static ArrayList<String> DuelLinksCards = new ArrayList<String>();
     public static ArrayList<Integer> DuelLinksLimits = new ArrayList<Integer>();
-    public static ArrayList<Status> StatusUpdates = new ArrayList<Status>();
+    //public static ArrayList<Status> StatusUpdates = new ArrayList<Status>();
     public static ArrayList<Card> Cards = new ArrayList<Card>();
     public static ArrayList<Card> CardsAlpha = new ArrayList<Card>();
     public static ArrayList<JSONObject> CardObjects = new ArrayList<JSONObject>();
-    public static ArrayList<Group> Groups = new ArrayList<Group>();
+    //public static ArrayList<Group> Groups = new ArrayList<Group>();
     public static ArrayList<Message> PublicMessages = new ArrayList<Message>();
     public static ArrayList<Message> WatchMessages = new ArrayList<Message>();
     public static ArrayList<Message> GroupMessages = new ArrayList<Message>();
     public static ArrayList<Message> PrivateMessages = new ArrayList<Message>();
     public static ArrayList<AdminAction> AdminActions = new ArrayList<AdminAction>();
     //public static ArrayList<Status> StatusUpdatesQueue = new ArrayList<Status>();
-    public static ArrayList<JournalEntry> JournalEntries = new ArrayList<JournalEntry>();
+    //public static ArrayList<JournalEntry> JournalEntries = new ArrayList<JournalEntry>();
     public static ArrayList<DuelEntry> DuelEntries = new ArrayList<DuelEntry>();
     public static ArrayList<String> BlacklistedIPs = new ArrayList<String>();
     public static ArrayList<String> BlacklistedDBIds = new ArrayList<String>();
@@ -1430,38 +1430,12 @@ public class DataHandler {
         arr.clear();
     }
     
-    public static void recycleStatus(Status status) {
-        status.user = null;
-        RecycledStatuses.add(status);
-    }
-    
-    public static void recycleJournalEntries(ArrayList<JournalEntry> arr) {
-        if (arr == null) {
-            return;
-        }
-        for (int i = 0; i < arr.size(); i++) {
-            RecycledJournalEntries.add(arr.get(i));
-        }
-        arr.clear();
-    }
-    
     public static void recycleDuelEntries(ArrayList<DuelEntry> arr) {
         if (arr == null) {
             return;
         }
         for (int i = 0; i < arr.size(); i++) {
             RecycledDuelEntries.add(arr.get(i));
-        }
-        arr.clear();
-    }
-    
-    public static void recycleFriends(ArrayList<Friend> arr) {
-        if (arr == null) {
-            return;
-        }
-        for (int i = 0; i < arr.size(); i++) {
-            arr.get(i).init();
-            RecycledFriends.add(arr.get(i));
         }
         arr.clear();
     }
@@ -4557,7 +4531,6 @@ public class DataHandler {
                         user.pic = pic;
                         user.pic_id = pic_id;
                         user.nsfw = nsfw;
-                        updatePic(user);
                     }
                 }
             }
@@ -4592,47 +4565,6 @@ public class DataHandler {
         }
         catch (Exception e) {
             System.err.println(e.getMessage());
-        }
-    }
-    
-    public static void updatePic(User user) {
-        for (int i = 0; i < StatusUpdates.size(); i++) {
-            if (StatusUpdates.get(i).username.equals(user.username)) {
-                StatusUpdates.get(i).pic = user.pic;
-                StatusUpdates.get(i).nsfw = user.nsfw;
-            }
-        }
-        for (int i = 0; i < Users.size(); i++) {
-            for (int j = 0; j < Users.get(i).comments.size(); j++) {
-                if (Users.get(i).comments.get(j).user_id == user.id) {
-                    Users.get(i).comments.get(j).pic = user.pic;
-                    Users.get(i).comments.get(j).nsfw = user.nsfw;
-                }
-            }
-        }
-        for (int i = 0; i < Users.size(); i++) {
-            for (int j = 0; j < Users.get(i).friends_arr.size(); j++) {
-                if (Users.get(i).friends_arr.get(j).user_id == user.id) {
-                    Users.get(i).friends_arr.get(j).pic = user.pic;
-                    Users.get(i).friends_arr.get(j).nsfw = user.nsfw;
-                }
-            }
-        }
-        for (int i = 0; i < UserStates.size(); i++) {
-            for (int j = 0; j < UserStates.get(i).comments.size(); j++) {
-                if (UserStates.get(i).comments.get(j).user_id == user.id) {
-                    UserStates.get(i).comments.get(j).pic = user.pic;
-                    UserStates.get(i).comments.get(j).nsfw = user.nsfw;
-                }
-            }
-        }
-        for (int i = 0; i < UserStates.size(); i++) {
-            for (int j = 0; j < UserStates.get(i).friends_arr.size(); j++) {
-                if (UserStates.get(i).friends_arr.get(j).user_id == user.id) {
-                    UserStates.get(i).friends_arr.get(j).pic = user.pic;
-                    UserStates.get(i).friends_arr.get(j).nsfw = user.nsfw;
-                }
-            }
         }
     }
     
@@ -13687,26 +13619,6 @@ public class DataHandler {
         return new Message();
     }
     
-    public static Status newStatus() {
-        if (RecycledStatuses.size() > 0) {
-            Status status = RecycledStatuses.remove(0);
-            status.init();
-            return status;
-        }
-        TotalStatuses++;
-        return new Status();
-    }
-    
-    public static JournalEntry newJournalEntry() {
-        if (RecycledJournalEntries.size() > 0) {
-            JournalEntry je = RecycledJournalEntries.remove(0);
-            je.init();
-            return je;
-        }
-        TotalJournalEntries++;
-        return new JournalEntry();
-    }
-    
     public static DuelEntry newDuelEntry() {
         if (RecycledDuelEntries.size() > 0) {
             DuelEntry de = RecycledDuelEntries.remove(0);
@@ -13715,17 +13627,6 @@ public class DataHandler {
         }
         TotalDuelEntries++;
         return new DuelEntry();
-    }
-    
-    public static Friend newFriend() {
-        if (RecycledFriends.size() > 0) {
-            System.out.println("recycling friend");
-            Friend friend = RecycledFriends.remove(0);
-            friend.init();
-            return friend;
-        }
-        TotalFriends++;
-        return new Friend();
     }
     
     public static Watcher newWatcher() {
@@ -14257,7 +14158,7 @@ public class DataHandler {
         if (UserStates.size() > 3000) {
             user = UserStates.get(UserStates.size() - 1);
             UserStates.remove(user);
-            recycleFriends(user.friends_arr);
+            //recycleFriends(user.friends_arr);
             user.init();
             return user;
         }
