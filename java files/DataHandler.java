@@ -665,7 +665,7 @@ public class DataHandler {
                             break;
                         case "Get actions":
                             getActions(nbc, data, user);
-                            break;*/
+                            break;
                         case "Get screenshot":
                             getScreenshot(nbc, data, user);
                             break;
@@ -675,7 +675,7 @@ public class DataHandler {
                         case "Check decks":
                             checkDecks(nbc, data, user);
                             break;
-                        /*case "Add restricted phrase":
+                        case "Add restricted phrase":
                             addRestrictedPhrase(nbc, data, user);
                             break;
                         case "Remove restricted phrase":
@@ -952,42 +952,15 @@ public class DataHandler {
     }
     
     public static void connect(ChannelHandlerContext nbc, JSONObject data) {
-        String text = "";
         try {
-            System.out.println("Connecting at " + System.currentTimeMillis());
             String username = (String) data.get("username");
-            String alt_username = "";
             String password = (String) data.get("password");
             String session_id = (String) data.get("session");
-            String db_id = (String) data.get("db_id");
             Boolean administrate = (Boolean) data.get("administrate");
-            int version = (int) data.get("version");
-            String capabilities = (String) data.get("capabilities");
-            long connect_time = 0;
-            if (data.has("connect_time")) {
-                connect_time = Long.valueOf((int) data.get("connect_time"));
-            }
-            Boolean dn_client = false;
-            if (data.has("dn_client")) {
-                dn_client = true;
-            }
-            String nbc_address = nbc.channel().remoteAddress().toString().replaceAll("/", "");
-            if (nbc_address.indexOf(":") >= 0) {
-                nbc_address = nbc_address.substring(0, nbc_address.indexOf(":"));
-            }
-            String ip_address = nbc_address;
-            String freeze_id = nbc_address.replaceAll("\\.", "_");
             JSONObject result = new JSONObject();
-            if (version < Version) {
-                result.put("action", "Rejected");
-                result.put("message", "Client is out of date. Please refresh the page");
-                write(nbc, result);
-                return;
-            }
             for (int i = 0; i < Users.size(); i++) {
                 if (Users.get(i) != null) {
                     if (Users.get(i).username.equals(username) || Users.get(i).alt_username.equals(username) || Users.get(i).user_username.equals(username)) {
-                        System.out.println("2631");
                         if (Users.get(i).session_id.equals(session_id)) {
                             lostConnection(Users.get(i).nbc, Users.get(i), false);
                         }
@@ -1000,7 +973,7 @@ public class DataHandler {
                     }
                 }
             }
-            User user = getFromUserStates(username, password, ip_address, db_id);
+            User user = getFromUserStates(username, password);
             if (user == null) {
                 result.put("action", "Rejected");
                 result.put("message", "Password is different and invalid");
@@ -1013,13 +986,8 @@ public class DataHandler {
             user.nbc = nbc;
             user.username = username;
             user.password = password;
-            user.nbc_address = nbc_address;
-            user.capabilities = capabilities;
-            user.connect_time = connect_time;
-            user.connecting_millis = System.currentTimeMillis();
-            user.dn_client = dn_client;
-            user.connecting = true;
             user.session_id = session_id;
+            user.connecting = true;
             getDuelingbookUser(user, data);
         }
         catch (Exception e) {
@@ -1028,7 +996,6 @@ public class DataHandler {
                 JSONObject result = new JSONObject();
                 result.put("action", "Rejected");
                 result.put("message", "Unknown Error");
-                result.put("text", text + " ");
                 write(nbc, result);
             }
             catch (Exception f) {
@@ -13484,41 +13451,16 @@ public class DataHandler {
         return Suffixes[day_int];
     }
     
-    public static User getFromUserStates(String username, String password, String ip_address, String db_id) {
+    public static User getFromUserStates(String username, String password) {
         User user = null;
         try {
             for (int i = 0; i < UserStates.size(); i++) {
                 if (UserStates.get(i) != null) {
                     if (UserStates.get(i).username != null && UserStates.get(i).username.equalsIgnoreCase(username)) {
-                        user = UserStates.get(i);
-                        if (user.password == null || !user.password.equals(password)) {
-                            try {
-                                String query = "SELECT * FROM login_table WHERE username = '" + escapeForSQL(username) + "' AND password = '" + escapeForSQL(password) + "'";
-                                Statement st = getConnection().createStatement();
-                                ResultSet rs = executeQuery(st, query);
-                                if (rs.next()) {
-                                    st.close();
-                                    UserStates.remove(user);
-                                    return user;
-                                }
-                                else {
-                                    st.close();
-                                    return null;
-                                }
-                            }
-                            catch (Exception e) {
-                                System.err.println(e.getMessage());
-                            }
-                        }
-                        else {
-                            user.login_complete = true;
-                            UserStates.remove(user);
-                            return user;
-                        }
+                        user = UserStates.remove(i);
+                        user.login_complete = true;
+                        return user;
                     }
-                }
-                else {
-                    System.out.println("USER IS NULL");
                 }
             }
         }
@@ -13528,7 +13470,6 @@ public class DataHandler {
         if (UserStates.size() > 3000) {
             user = UserStates.get(UserStates.size() - 1);
             UserStates.remove(user);
-            //recycleFriends(user.friends_arr);
             user.init();
             return user;
         }
@@ -13584,177 +13525,6 @@ public class DataHandler {
                 PoolEnabled = true;
             }
             messageE(nbc, message);
-        }
-        catch (Exception e) {
-            System.err.println(e.getMessage());
-        }
-    }
-    
-    public static void getActions(ChannelHandlerContext nbc, JSONObject data, User user) {
-        try {
-            if (user.admin < 1 && user.moderator < 2 && user.adjudicator < 1) {
-                invalidRequest(nbc);
-                return;
-            }
-            String username = (String) data.get("username");
-            JSONObject result = new JSONObject();
-            User person = getUser(username);
-            if (person == null) {
-                errorE(nbc, username + " is not online");
-                return;
-            }
-            if (person.username == null) {
-                errorE(nbc, username + "'s username is null");
-                return;
-            }
-            if (user.moderator < 2) {
-                if (person.duel_id != user.duel_id) {
-                    errorE(nbc, "You must be in the same duel as this user to use this tool");
-                    return;
-                }
-            }
-            String actions = escapeHTML(person.username) + "<br><br>";
-            for (int i = 0; i < person.actions.size(); i++) {
-                if (person.actions.get(i).get("action").equals("START DUEL")) {
-                    actions += "<font color=\"#FF0000\">Duel started (" + escapeHTML((String) person.actions.get(i).get("message")) + ")</font>";
-                }
-                else {
-                    actions += person.actions.get(i).get("action");
-                }
-                if (person.actions.get(i).has("play")) {
-                    actions += " | " + person.actions.get(i).get("play");
-                }
-                actions += "<font color=\"#AAAAAA\"> - " + getDetailedTimeAgo((long) person.actions.get(i).get("time")) + "</font><br>";
-            }
-            if (person.actions.size() > 1 && getSecondsAgo((long) person.actions.get(person.actions.size() - 1).get("time")) > 32) {
-                actions += "<font color=\"#FF0000\">User may have lost connection</font><br>";
-            }
-            result.put("action", "Long message");
-            result.put("message", actions);
-            result.put("html", true);
-            write(nbc, result);
-        }
-        catch (Exception e) {
-            System.err.println(e.getMessage());
-        }
-    }
-    
-    public static void getScreenshot(ChannelHandlerContext nbc, JSONObject data, User user) {
-        try {
-            if (user.admin < 1 && user.moderator < 1 && user.adjudicator < 1) {
-                invalidRequest(nbc);
-                return;
-            }
-            String username = (String) data.get("username");
-            JSONObject result = new JSONObject();
-            User person = getUser(username);
-            if (person != null) {
-                if (user.moderator < 1) {
-                    if (user.duel_id == 0) {
-                        invalidRequest(nbc);
-                        return;
-                    }
-                    if (person.duel_id == 0) {
-                        errorE(nbc, person.username + " is not dueling");
-                        return;
-                    }
-                }
-            }
-            else {
-                errorE(nbc, username + " is not online");
-                return;
-            }
-            result.put("action", "Get screenshot");
-            result.put("username", user.username);
-            write(person.nbc, result);
-        }
-        catch (Exception e) {
-            System.err.println(e.getMessage());
-        }
-    }
-    
-    public static void sendScreenshot(ChannelHandlerContext nbc, JSONObject data, User user) {
-        try {
-            String username = (String) data.get("username");
-            String link = (String) data.get("link");
-            JSONObject result = new JSONObject();
-            User person = getUser(username);
-            if (person != null) {
-                if (person.admin < 1 && person.moderator < 1 && person.adjudicator < 1) {
-                    return;
-                }
-                if (link.indexOf("https://imgur.com/") != 0 && link.indexOf("https://i.imgur.com") != 0) {
-                    return;
-                }
-                result.put("action", "Send screenshot");
-                result.put("link", link);
-                write(person.nbc, result);
-            }
-        }
-        catch (Exception e) {
-            System.err.println(e.getMessage());
-        }
-    }
-    
-    public static void checkDecks(ChannelHandlerContext nbc, JSONObject data, User user) {
-        try {
-            if (user.admin < 1 && user.moderator < 1) {
-                invalidRequest(nbc);
-                return;
-            }
-            String username = (String) data.get("username");
-            JSONObject result = new JSONObject();
-            User person = getUser(username);
-            if (person == null) {
-                errorE(nbc, username + " is not online");
-                return;
-            }
-            username = person.username;
-            String message = escapeHTML(person.user_username) + "\nDefault Deck: " + escapeHTML(person.default_deck) + "\n";
-            message += "Beginner: ";
-            if (person.beginner == 1) {
-                message += "Yes\n\n";
-            }
-            else {
-                message += "No\n\n";
-            }
-            for (int i = 0; i < person.decks.size(); i++) {
-                if (person.decks.get(i).get("legality").equals("Unlimited") && (int) person.decks.get(i).get("goat") == 0) {
-                    message += "<u><a href=\"https://www.duelingbook.com/deck?id=" + person.decks.get(i).get("id") + "\" target=\"_blank\"><font color=\"#0000FF\">" + escapeHTML((String) person.decks.get(i).get("name")) + "</font></a></u> ";
-                }
-                else if (person.decks.get(i).get("legality").equals("Advanced") && (int) person.decks.get(i).get("tcg") == 0 && (int) person.decks.get(i).get("ocg") == 0) {
-                    message += "<u><a href=\"https://www.duelingbook.com/deck?id=" + person.decks.get(i).get("id") + "\" target=\"_blank\"><font color=\"#0000FF\">" + escapeHTML((String) person.decks.get(i).get("name")) + "</font></a></u> ";
-                }
-                else {
-                    message += person.decks.get(i).get("name") + " ";
-                }
-                if (person.decks.get(i).get("legality").equals("Advanced")) {
-                    message += "<font color=\"#009900\">Advanced</font>";
-                }
-                else if (person.decks.get(i).get("legality").equals("")) {
-                    message += "<font color=\"#777777\">Unknown</font>";
-                }
-                else if (person.decks.get(i).get("legality").equals("Illegal")) {
-                    message += "<font color=\"#777777\">Under 40 cards</font>";
-                }
-                else {
-                    message += "<font color=\"#777777\">" + person.decks.get(i).get("legality") + "</font>";
-                }
-                if ((int) person.decks.get(i).get("tcg") == 1) {
-                    message += ", <font color=\"#777777\">TCG</font>";
-                }
-                if ((int) person.decks.get(i).get("ocg") == 1) {
-                    message += ", <font color=\"#777777\">OCG</font>";
-                }
-                if ((int) person.decks.get(i).get("goat") == 1) {
-                    message += ", <font color=\"#777777\">GOAT</font>";
-                }
-                message += "\n";
-            }
-            result.put("action", "Long message");
-            result.put("message", message);
-            result.put("html", true);
-            write(nbc, result);
         }
         catch (Exception e) {
             System.err.println(e.getMessage());
