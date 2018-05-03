@@ -1,23 +1,13 @@
 package nettysocketserver;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.DataOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.sql.*;
 import java.net.*;
-import java.math.BigDecimal;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.text.Normalizer;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -29,7 +19,6 @@ public class DataHandler {
     
     public static ArrayList<Connection> Connections = new ArrayList<Connection>();
     public static ArrayList<User> Users = new ArrayList<User>();
-    //public static ArrayList<User> ConnectingUsers = new ArrayList<User>();
     public static ArrayList<User> UserStates = new ArrayList<User>();
     public static ArrayList<User> Admins = new ArrayList<User>();
     public static ArrayList<User> Pool = new ArrayList<User>();
@@ -38,124 +27,34 @@ public class DataHandler {
     public static ArrayList<Duel> RecycledDuels = new ArrayList<Duel>();
     public static ArrayList<Player> RecycledPlayers = new ArrayList<Player>();
     public static ArrayList<Message> RecycledMessages = new ArrayList<Message>();
-    //public static ArrayList<Status> RecycledStatuses = new ArrayList<Status>();
-    //public static ArrayList<JournalEntry> RecycledJournalEntries = new ArrayList<JournalEntry>();
     public static ArrayList<DuelEntry> RecycledDuelEntries = new ArrayList<DuelEntry>();
-    //public static ArrayList<Friend> RecycledFriends = new ArrayList<Friend>();
     public static ArrayList<Watcher> RecycledWatchers = new ArrayList<Watcher>();
     public static ArrayList<User> DuelRoom = new ArrayList<User>();
     public static ArrayList<Call> Calls = new ArrayList<Call>();
     public static ArrayList<String> GoatFormatCards = new ArrayList<String>();
     public static ArrayList<Integer> GoatFormatLimits = new ArrayList<Integer>();
-    public static ArrayList<String> DuelLinksCards = new ArrayList<String>();
-    public static ArrayList<Integer> DuelLinksLimits = new ArrayList<Integer>();
-    //public static ArrayList<Status> StatusUpdates = new ArrayList<Status>();
     public static ArrayList<Card> Cards = new ArrayList<Card>();
     public static ArrayList<Card> CardsAlpha = new ArrayList<Card>();
     public static ArrayList<JSONObject> CardObjects = new ArrayList<JSONObject>();
-    //public static ArrayList<Group> Groups = new ArrayList<Group>();
     public static ArrayList<Message> PublicMessages = new ArrayList<Message>();
     public static ArrayList<Message> WatchMessages = new ArrayList<Message>();
-    public static ArrayList<Message> GroupMessages = new ArrayList<Message>();
     public static ArrayList<Message> PrivateMessages = new ArrayList<Message>();
-    //public static ArrayList<AdminAction> AdminActions = new ArrayList<AdminAction>();
-    //public static ArrayList<Status> StatusUpdatesQueue = new ArrayList<Status>();
-    //public static ArrayList<JournalEntry> JournalEntries = new ArrayList<JournalEntry>();
     public static ArrayList<DuelEntry> DuelEntries = new ArrayList<DuelEntry>();
-    public static ArrayList<String> BlacklistedIPs = new ArrayList<String>();
-    public static ArrayList<String> BlacklistedDBIds = new ArrayList<String>();
-    public static ArrayList<String> WhitelistedIPs = new ArrayList<String>();
-    public static ArrayList<String> WhitelistedUsernames = new ArrayList<String>();
-    public static ArrayList<String> FrozenIPs = new ArrayList<String>();
-    public static ArrayList<String> Donators = new ArrayList<String>();
-    public static ArrayList<String> RestrictedPhrases = new ArrayList<String>();
-    public static ArrayList<String> IllegalPhrases = new ArrayList<String>();
-    public static ArrayList<Integer> GithubAttemptArray = new ArrayList<Integer>();
-    public static ArrayList<Integer> DuelingbookAttemptArray = new ArrayList<Integer>();
-    public static ArrayList<Integer> GithubSuccessArray = new ArrayList<Integer>();
-    public static ArrayList<Integer> DuelingbookSuccessArray = new ArrayList<Integer>();
-    public static ArrayList<String> UnseenMessageUsernames = new ArrayList<String>();
-    public static ArrayList<String> NewUnseenMessageUsernames = new ArrayList<String>();
-    public static ArrayList<Message> UnseenMessages = new ArrayList<Message>();
-    public static ArrayList<String> FriendRequestsUsernames = new ArrayList<String>();
-    public static ArrayList<String> UnseenCommentsUsernames = new ArrayList<String>();
-    public static ArrayList<String> SmallDonations = new ArrayList<String>();
-    public static ArrayList<String> InvalidDonations = new ArrayList<String>();
-    public static ArrayList<String> BadRatings = new ArrayList<String>();
-    public static ArrayList<String> DuplicateRatings = new ArrayList<String>();
-    //public static ArrayList<String> WebsocketUsers = new ArrayList<String>();
-    public static ArrayList<String> Moderators = new ArrayList<String>();
-    public static String InfoLog = "";
-    public static String DuplicateLog = "";
-    public static String WriteLog = "";
-    public static String ActionsLog = "";
-    public static String ActionsLogging = "";
-    public static int ActionLoggingTimes = 0;
-    public static String DuplicateRatingLog = "";
-    public static String CardError = "";
-    public static String LostConnectionLog = "";
-    public static String IllegalPhrasesLog = "";
     public static Timer messagesTimer;
     public static TimerTask messagesTimerTask;
     public static int messageSeconds = 0;
     public static int PublicMessageIds = 0;
     public static int DuelIds = 0;
-    public static int GroupIds = 0;
-    public static int StatusIds = 0;
     public static int DeckIds = 0;
-    public static int TotalDuels = 0;
-    public static int TotalCalls = 0;
-    public static int TotalUsers = 0;
-    //public static int CurrentFolder = 0;
-    public static int BotLimit = 0;
-    public static int ConnectionIndex = 0;
-    public static Timer rebootTimer;
-    public static TimerTask rebootTimerTask;
-    public static int rebootSeconds = 0;
-    public static Boolean rebooting = false;
-    public static int announcementId;
-    public static String announcementHeading;
-    public static String announcementBody;
     public static Boolean caution = false;
-    public static int GroupIterations = 0;
-    public static int QPS = 0;
-    public static int lastQPS = 0;
-    public static int TotalQPS = 0;
     public static int Minutes = 0;
-    public static long LastActionMillis = 0;
-    public static int TotalDuelObjects = 0;
-    public static int TotalPlayers = 0;
-    public static int TotalMessages = 0;
-    public static int TotalStatuses = 0;
-    public static int TotalJournalEntries = 0;
-    public static int TotalDuelEntries = 0;
-    public static int TotalFriends = 0;
-    public static int TotalWatchers = 0;
     public static Boolean PoolEnabled = true;
-    public static int PoolEvents = 0;
     public static Timer qpsTimer;
     public static TimerTask qpsTimeoutTask;
-    public static Pattern DuplicatePattern = Pattern.compile("([a-zA-Z0-9 ])\\1{10}");
     public static Pattern ASCIIPattern = Pattern.compile("\\A\\p{ASCII}*\\z");
-    public static Pattern NormailizePattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
-    public static final Pattern EmailPattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
     public static SortIgnoreCase sortIgnoreCase = new SortIgnoreCase();
     public static CardSorter cardSorter = new CardSorter();
-    //public static CallableStatement getDuelingbookUserCS;
-    //public static CallableStatement getLoginCS;
-    //public static CallableStatement getDecksCS;
-    //public static CallableStatement getFollowingCS;
-    //public static CallableStatement getFriendsCS;
-    //public static CallableStatement loadMessagesCS;
-    //public static CallableStatement loadAllMessagesCS;
     public static Boolean CheckingAFK = false;
-    public static Boolean ReportingLostConnections = false;
-    public static Boolean ReportingActions = true;
-    public static Boolean ReportingQueries = true;
-    public static Boolean BypassingDuelingbookUser = true;
-    public static Boolean NewUsersCannotPostStatuses = false;
-    public static Boolean LowExpCannotPostStatuses = false;
-    public static Boolean DebuggingStatuses = false;
     public static Boolean UpdatingRatings = true;
     public static Boolean InsertingMessages = false;
     public static String[] GeneralPlaysArr = {"Call admin", "Cancel call", "Admit defeat", "Quit duel", "Offer draw", "Revoke draw", "Accept draw", "Offer rematch", "Revoke rematch", "Game loss", "Match loss", "Loss", "Cancel game", "Accept rematch", "Siding", "Begin next duel", "Back to RPS", "Add watcher", "Remove watcher", "Duel message", "Watcher message", "Start turn", "Summon token", "Call admin"};
@@ -180,32 +79,13 @@ public class DataHandler {
     public static int[] WinsNeededArr = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 25, 25, 25, 25, 25, 50, 50, 50, 50, 50, 50, 75, 75, 75, 75, 75, 75, 100, 100, 100, 100, 100, 100, 250, 250, 250, 250, 250, 250, 500, 500, 500, 500, 500, 500, 750, 750, 750, 750, 750, 750, 1000, 1000, 1000, 1000, 1000, 1000, 2000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 3000};
     public static Timestamp StartupTimestamp = new Timestamp(System.currentTimeMillis());
     public static int MaxUsers = 9000;
-    public static int MostUsers = 0;
-    public static int JudgesGroup = 8;
     public static String DB_URL;
     public static String DB_DATABASE;
     public static String DB_USERNAME;
     public static String DB_PASSWORD;
-    public static String GITHUB_TOKEN;
-    public static String PAYPAL_EMAIL;
-    public static String PAYPAL_PASSWORD;
-    public static String PAYPAL_SIGNATURE;
-    public static String CLEVERBOT_KEY;
-    public static String SECRET_PASSWORD;
-    public static ArrayList<String> SECRET_USERS = new ArrayList<String>();
-    public static ArrayList<String> VIP_USERS = new ArrayList<String>();
-    public static String PROFILE_PICS_PATH;
     public static int Version = 108;
     
     public static void startUp() {
-        if (Main.local == true) {
-            //caution = true;
-            WhitelistedIPs.add("127.0.0.1");
-        }
-        if (InsertingMessages == false) {
-            //caution = true;
-            UpdatingRatings = false;
-        }
         createConnection();
         loadCards();
         try {
@@ -236,17 +116,9 @@ public class DataHandler {
         qpsTimeoutTask = new TimerTask() {
             public void run() {
                 try {
-                    lastQPS = QPS;
-                    TotalQPS += QPS;
-                    QPS = 0;
-                    PoolEvents++;
                     poolEvent();
                     for (int i = 0; i < Duels.size(); i++) {
                         Duels.get(i).seconds++;
-                        if (Duels.get(i).rated == true && Duels.get(i).active == true) {
-                            Duels.get(i).player1.checkAFK();
-                            Duels.get(i).player2.checkAFK();
-                        }
                     }
                     for (int i = 0; i < Hosts.size(); i++) {
                         if (Hosts.get(i) == null) {
@@ -282,48 +154,13 @@ public class DataHandler {
                 errorE(nbc, "Special characters were detected. Your request did not go through.");
                 return;
             }
-            if (InsertingMessages == true) {
-                if (System.currentTimeMillis() - LastActionMillis > 5000) {
-                    ActionLoggingTimes++;
-                    ActionsLog = ActionsLogging + "\nOnline users: " + Users.size() + "\nSeconds: " + (System.currentTimeMillis() - LastActionMillis) + "\nTime: " + new Timestamp(System.currentTimeMillis()).toString() + "\nTimes:" + ActionLoggingTimes + "\nNext Data String: " + data.toString();
-                }
-                LastActionMillis = System.currentTimeMillis();
-                ActionsLogging += data.toString() + "\n";
-                if (ActionsLogging.length() > 5000) {
-                    ActionsLogging = "";
-                }
-            }
             for (int i = 0; i < Users.size(); i++) {
                 if (Users.get(i).nbc != null) {
                     if (Users.get(i).nbc.equals(nbc)) {
                         user = Users.get(i);
                         user.nbc = nbc;
                         if (data.has("action")) {
-                            if (!data.get("action").equals("Heartbeat") && !data.get("action").equals("Activate") && !data.get("action").equals("Deactivate")) {
-                                if (!data.get("action").equals("Load statuses") && !data.get("action").equals("Get groups") && !data.get("action").equals("Connect")) {
-                                    if (user.timeout_timestamp != null) {
-                                        if (user.timeout_timestamp.getTime() > System.currentTimeMillis() - 300) {
-                                            if (data.toString().equals(user.lastDataString) || data.get("action").toString().indexOf("message") >= 0) {
-                                                return;
-                                            }
-                                        }
-                                    }
-                                }
-                                user.seconds = 0;
-                                user.timeout_timestamp = new Timestamp(System.currentTimeMillis());
-                            }
-                            else {
-                                user.connection_timestamp = new Timestamp(System.currentTimeMillis());
-                            }
-                            if (data.has("message")) {
-                                if (((String) data.get("message")).length() > 500) {
-                                    invalidRequest(nbc);
-                                    return;
-                                }
-                            }
-                        }
-                        else {
-                            System.out.println("data = " + data);
+                            user.connection_timestamp = new Timestamp(System.currentTimeMillis());
                         }
                     }
                 }
@@ -334,38 +171,11 @@ public class DataHandler {
                     result = new JSONObject();
                     result.put("action", "Banned");
                     write(nbc, result);
-                    InfoLog += "On line 571, " + user.username + " is banned. ip_address = " + user.ip_address + ", nbc_address = " + user.nbc_address + "\n";
                     return;
-                }
-                user.defragmenting = false;
-                user.lastDataString = data.toString();
-                if (user.actions.size() > 50) {
-                    JSONObject dead_action = user.actions.get(0);
-                    dead_action = null;
-                    user.actions.remove(0);
-                }
-                JSONObject new_action = new JSONObject(data, JSONObject.getNames(data));
-                new_action.put("time", System.currentTimeMillis());
-                user.actions.add(new_action);
-                //user.actions.add(new Timestamp(System.currentTimeMillis()) + " - " + (String) data.get("action"));
-                
-                for (int i = 0; i < IllegalPhrases.size(); i++) {
-                    if (data.toString().contains(IllegalPhrases.get(i))) {
-                        if (!data.toString().contains("Remove illegal phrase") && !data.toString().contains("Add illegal phrase")) {
-                            IllegalPhrasesLog += user.username + " tried to say " + IllegalPhrases.get(i) + " in " + data.toString() + "\n";
-                            result.put("action", "Unlock");
-                            write(nbc, result);
-                            return;
-                        }
-                    }
-                }
-                if (!action.equals("Heartbeat") && !action.equals("Get user id")) {
-                    user.lastAction = data.toString();
                 }
             }
             switch(action) {
                 case "Connect":
-                    //connect(nbc, data, true);
                     connect(nbc, data);
                     return;
             }
@@ -851,9 +661,6 @@ public class DataHandler {
                         case "Cancel reboot":
                             cancelReboot(nbc, data, user);
                             break;*/
-                        case "Caution":
-                            cautionE(nbc, data, user);
-                            break;
                         case "Refresh cards":
                             refreshCards(nbc, data, user);
                             break;
@@ -1002,35 +809,29 @@ public class DataHandler {
             remember_me = 2;
         }
         JSONObject result = new JSONObject();
-        user.log += "Loading duelingbook_user at " + new Timestamp(System.currentTimeMillis()) + "\n";
-        if (user.updateUser == true || administrate == true || user.judge > 0 || user.admin_status > 0 || BypassingDuelingbookUser == false || user.activated == 0) {
-            user.db_millis = System.currentTimeMillis();
-            try {
-                System.out.println("Loading duelingbook_user for " + username);
-                CallableStatement cs = getConnection().prepareCall("{call getDuelingbookUser(?)}");
-                cs.setString(1, username);
-                cs.execute();
-                ResultSet rs = cs.getResultSet();
-                if (rs.next()) {
-                    user.id = rs.getInt("id");
-                    user.username = rs.getString("username");
-                    user.pic = rs.getString("pic");
-                    user.default_deck = rs.getString("default_deck");
-                }
-                else {
-                    result.put("action", "Rejected");
-                    result.put("message", "Invalid username");
-                    write(user.nbc, result);
-                    return;
-                }
-                cs.close();
-                user.db_millis = System.currentTimeMillis() - user.db_millis;
-                user.updateUser = false;
+        try {
+            System.out.println("Loading duelingbook_user for " + username);
+            CallableStatement cs = getConnection().prepareCall("{call getDuelingbookUser(?)}");
+            cs.setString(1, username);
+            cs.execute();
+            ResultSet rs = cs.getResultSet();
+            if (rs.next()) {
+                user.id = rs.getInt("id");
+                user.username = rs.getString("username");
+                user.pic = rs.getString("pic");
+                user.default_deck = rs.getString("default_deck");
+                /* ... */
             }
-            catch (Exception e) {
-                System.err.println(e.getMessage());
-                InfoLog += "Line 1541 entered for " + username + "\n";
+            else {
+                result.put("action", "Rejected");
+                result.put("message", "Invalid username");
+                write(user.nbc, result);
+                return;
             }
+            cs.close();
+        }
+        catch (Exception e) {
+            System.err.println(e.getMessage());
         }
         getDecks(user, data);
     }
@@ -1093,9 +894,6 @@ public class DataHandler {
         user.last_duel_id = 0;
         user.publicChatLimit = 0;
         Users.add(user);
-        if (MostUsers < Users.size()) {
-            MostUsers = Users.size();
-        }
         
         ArrayList<JSONObject> users = new ArrayList<JSONObject>();
         for (int i = 0; i < Users.size(); i++) {
@@ -1110,7 +908,6 @@ public class DataHandler {
             }
             users.add(online_user);
         }
-        System.out.println("2280");
         result.put("action", "Connected");
         result.put("username", user.username);
         result.put("alt_username", user.alt_username);
@@ -1199,32 +996,12 @@ public class DataHandler {
         if (user.firstLogin == true) {
             result.put("firstLogin", user.firstLogin);
         }
-        if (user.donator == 2) {
-            result.put("donator", user.donator);
-        }
         for (int i = 0; i < Users.size(); i++) {
             if (Users.get(i).nbc != null) {
                 if (!Users.get(i).nbc.equals(user.nbc)) {
                     write(Users.get(i).nbc, result);
                 }
             }
-        }
-        if (rebooting == true) {
-            result = new JSONObject();
-            result.put("action", "Reboot server");
-            result.put("seconds", rebootSeconds);
-            write(user.nbc, result);
-        }
-        //if (user.activated == 0 && user.email != null && user.announcement.size() == 0) {
-        if (user.activated == 0 && user.email != null) {
-            result = new JSONObject();
-            result.put("action", "Announcement");
-            result.put("title", "Confirm Email");
-            result.put("message", "<a href=\"event:confirm\"><u><font color=\"#00CCFF\">Confirm</font></u><a></font> your email at " + escapeHTML(user.email) + " to help secure your account");
-            write(user.nbc, result);
-        }
-        if (user.announcement.size() > 0) {
-            user.announcement = new ArrayList<String>();
         }
         user.times_online++;
         user.nbc.flush();
@@ -1267,11 +1044,6 @@ public class DataHandler {
                 write(nbc, result);
                 return;
             }
-            if (Users.size() > MaxUsers && !WhitelistedIPs.contains(ip_address) && !Donators.contains(username)) {
-                result.put("action", "Max users reached");
-                write(nbc, result);
-                return;
-            }
             for (int i = 0; i < Users.size(); i++) {
                 if (Users.get(i) != null) {
                     if (Users.get(i).username.equals(username) || Users.get(i).alt_username.equals(username) || Users.get(i).user_username.equals(username)) {
@@ -1293,7 +1065,6 @@ public class DataHandler {
                 result.put("action", "Rejected");
                 result.put("message", "Password is different and invalid");
                 write(nbc, result);
-                InfoLog += username + " was rejected because of his password was different and invalid\n";
                 return;
             }
             if (user.connecting == true) {
@@ -1313,17 +1084,12 @@ public class DataHandler {
         }
         catch (Exception e) {
             System.err.println(e.getMessage());
-            InfoLog += text;
             try {
-                System.out.println("Rejected because of an unknown error");
-                System.out.println("text = " + text);
                 JSONObject result = new JSONObject();
                 result.put("action", "Rejected");
                 result.put("message", "Unknown Error");
                 result.put("text", text + " ");
                 write(nbc, result);
-                InfoLog += "user " + nbc.channel().remoteAddress().toString().replaceAll("/", "") + " was rejected because of an unknown error.\n";
-                InfoLog += data.toString() + "\n";
             }
             catch (Exception f) {
                 System.err.println(f.getMessage());
@@ -1382,13 +1148,6 @@ public class DataHandler {
             publicMessage.color = color;
             publicMessage.html = html;
             publicMessage.hidden = user.ignored;
-            for (int i = 0; i < RestrictedPhrases.size(); i++) {
-                if (RestrictedPhrases.get(i).length() > 10) {
-                    if (message.toUpperCase().indexOf(RestrictedPhrases.get(i).toUpperCase()) >= 0 || message.equals(" ")) {
-                        publicMessage.hidden = 1;
-                    }
-                }
-            }
             if (publicMessage.hidden == 1) {
                 publicMessage.hidden_by = "Duelingbook";
             }
@@ -1669,11 +1428,6 @@ public class DataHandler {
                 privateMessage.sender_judge = sender_judge;
                 privateMessage.receiver_judge = receiver_judge;
                 PrivateMessages.add(privateMessage);
-            }
-            if (seen == 0) {
-                if (!UnseenMessageUsernames.contains(receiver)) {
-                    UnseenMessageUsernames.add(receiver);
-                }
             }
             if (seen == 1 && person.bot == 1) {
                 result.put("receiver", receiver);
@@ -3969,131 +3723,10 @@ public class DataHandler {
             if (person != null) {
                 user_id = person.id;
                 username = person.username;
-                ban_status = person.ban_status;
-                disabled = 0;
                 status = "Online";
                 last_seen = "Now";
-                registered = person.registered;
                 pic = person.pic;
-                nsfw = person.nsfw;   
-                customs = person.customs;
-                if (person.latitude != 0 && user.latitude != 0) {
-                    distance = (int) Math.sqrt(Math.pow(69.1 * (person.latitude - user.latitude), 2) + Math.pow(69.1 * (user.longitude - person.longitude) * Math.cos(person.latitude / 57.3), 2));
-                }
-                region = person.region;
-                country = person.country_code;
-                location = person.region + ", " + person.country_code;
-                facebook = person.facebook;
-                youtube = person.youtube;
-                twitter = person.twitter;
-                instagram = person.instagram;
-                skype = person.skype;
-                discord = person.discord;
-                snapchat = person.snapchat;
-                kik = person.kik;
-                tumblr = person.tumblr;
-                twitch = person.twitch;
-                steam = person.steam;
-                duel_links = person.duel_links;
-                if (!facebook.equals("")) {
-                    JSONObject site = new JSONObject();
-                    site.put("site", "facebook");
-                    site.put("link", facebook);
-                    social.add(site);
-                }
-                if (!youtube.equals("")) {
-                    JSONObject site = new JSONObject();
-                    site.put("site", "youtube");
-                    site.put("link", youtube);
-                    social.add(site);
-                }
-                if (!twitter.equals("")) {
-                    JSONObject site = new JSONObject();
-                    site.put("site", "twitter");
-                    site.put("link", twitter);
-                    social.add(site);
-                }
-                if (!instagram.equals("")) {
-                    JSONObject site = new JSONObject();
-                    site.put("site", "instagram");
-                    site.put("link", instagram);
-                    social.add(site);
-                }
-                if (!skype.equals("")) {
-                    JSONObject site = new JSONObject();
-                    site.put("site", "skype");
-                    site.put("link", skype);
-                    social.add(site);
-                }
-                if (!discord.equals("")) {
-                    JSONObject site = new JSONObject();
-                    site.put("site", "discord");
-                    site.put("link", discord);
-                    social.add(site);
-                }
-                if (!snapchat.equals("")) {
-                    JSONObject site = new JSONObject();
-                    site.put("site", "snapchat");
-                    site.put("link", snapchat);
-                    social.add(site);
-                }
-                if (!kik.equals("")) {
-                    JSONObject site = new JSONObject();
-                    site.put("site", "kik");
-                    site.put("link", kik);
-                    social.add(site);
-                }
-                if (!tumblr.equals("")) {
-                    JSONObject site = new JSONObject();
-                    site.put("site", "tumblr");
-                    site.put("link", tumblr);
-                    social.add(site);
-                }
-                if (!twitch.equals("")) {
-                    JSONObject site = new JSONObject();
-                    site.put("site", "twitch");
-                    site.put("link", twitch);
-                    social.add(site);
-                }
-                /*if (!steam.equals("")) {
-                    JSONObject site = new JSONObject();
-                    site.put("site", "steam");
-                    site.put("link", steam);
-                    social.add(site);
-                }*/
-                if (!duel_links.equals("")) {
-                    JSONObject site = new JSONObject();
-                    site.put("site", "duel_links");
-                    site.put("link", duel_links);
-                    social.add(site);
-                }
                 profile_txt = person.profile_txt;
-                views = person.views;
-                html = person.html_txt;
-                gender = person.gender;
-                orientation = person.orientation;
-                languages = person.languages;
-                match_rating = person.match_rating;
-                match_experience = person.match_experience;
-                single_rating = person.single_rating;
-                single_experience = person.single_experience;
-                match_wins = person.match_wins;
-                single_wins = person.single_wins;
-                match_losses = person.match_losses;
-                single_losses = person.single_losses;
-                match_draws = person.match_draws;
-                single_draws = person.single_draws;
-                allow_comments = person.allow_comments;
-                allow_comments_friends_only = person.allow_comments_friends_only;
-                require_comment_approval = person.require_comment_approval;
-                message_friends_only = person.message_friends_only;
-                show_location = person.show_location;
-                show_distance = person.show_distance;
-                song = person.song;
-                ids = person.ids;
-                pics = person.pics;
-                nsfws = person.nsfws;
-                total_comments = person.total_comments;
                 if (person.duel_id != 0 && person.duel != null && person.duel.active == true) {
                     if (person.duel.watching == true || user.admin > 0) {
                         duel_id = person.duel_id;
@@ -4105,7 +3738,7 @@ public class DataHandler {
             }
             else {
                 try {
-                    String query = "SELECT *, DATE_FORMAT(join_date,'%b %d, %Y, %l:%i %p') AS registered, SQRT(POW(69.1 * (latitude - " + user.latitude + "), 2) + POW(69.1 * (" + user.longitude + " - longitude) * COS(latitude / 57.3), 2)) AS distance FROM duelingbook_user db";
+                    String query = "SELECT * FROM duelingbook_user";
                     if (user_id == 0) {
                         query += " WHERE username = '" + escapeForSQL(username) + "' OR alt_username = '" + escapeForSQL(username) + "'";
                     }
@@ -4117,130 +3750,9 @@ public class DataHandler {
                     if (rs.next()) {
                         user_id = rs.getInt("id");
                         username = rs.getString("username");
-                        ban_status = rs.getInt("ban_status");
-                        disabled = rs.getInt("is_disabled");
-                        if (rs.getTimestamp("last_seen") == null) {
-                            last_seen = "Never";
-                            last_seen2 = "Never"; // ??
-                            if (bot == true) {
-                                last_seen = "Now";
-                            }
-                        }
-                        else {
-                            Timestamp timestamp = rs.getTimestamp("last_seen");
-                            long time = timestamp.getTime();
-                            last_seen = getDetailedTimeAgo(time);
-                            last_seen2 = getTimeAgo(time);
-                        }
-                        registered = rs.getString("registered");
                         pic = rs.getString("pic");
-                        nsfw = rs.getInt("nsfw");
-                        customs = rs.getInt("customs");
-                        if (user.latitude != 0) {
-                            distance = (int) Math.floor(rs.getInt("distance"));
-                        }
-                        region = deAccent(rs.getString("region"));
-                        country = deAccent(rs.getString("country_code"));
-                        location = region + ", " + country;
-                        if (!rs.getString("facebook").equals("")) {
-                            JSONObject site = new JSONObject();
-                            site.put("site", "facebook");
-                            site.put("link", rs.getString("facebook"));
-                            social.add(site);
-                        }
-                        if (!rs.getString("youtube").equals("")) {
-                            JSONObject site = new JSONObject();
-                            site.put("site", "youtube");
-                            site.put("link", rs.getString("youtube"));
-                            social.add(site);
-                        }
-                        if (!rs.getString("twitter").equals("")) {
-                            JSONObject site = new JSONObject();
-                            site.put("site", "twitter");
-                            site.put("link", rs.getString("twitter"));
-                            social.add(site);
-                        }
-                        if (!rs.getString("instagram").equals("")) {
-                            JSONObject site = new JSONObject();
-                            site.put("site", "instagram");
-                            site.put("link", rs.getString("instagram"));
-                            social.add(site);
-                        }
-                        if (!rs.getString("skype").equals("")) {
-                            JSONObject site = new JSONObject();
-                            site.put("site", "skype");
-                            site.put("link", rs.getString("skype"));
-                            social.add(site);
-                        }
-                        if (!rs.getString("discord").equals("")) {
-                            JSONObject site = new JSONObject();
-                            site.put("site", "discord");
-                            site.put("link", rs.getString("discord"));
-                            social.add(site);
-                        }
-                        if (!rs.getString("snapchat").equals("")) {
-                            JSONObject site = new JSONObject();
-                            site.put("site", "snapchat");
-                            site.put("link", rs.getString("snapchat"));
-                            social.add(site);
-                        }
-                        if (!rs.getString("kik").equals("")) {
-                            JSONObject site = new JSONObject();
-                            site.put("site", "kik");
-                            site.put("link", rs.getString("kik"));
-                            social.add(site);
-                        }
-                        if (!rs.getString("tumblr").equals("")) {
-                            JSONObject site = new JSONObject();
-                            site.put("site", "tumblr");
-                            site.put("link", rs.getString("tumblr"));
-                            social.add(site);
-                        }
-                        if (!rs.getString("twitch").equals("")) {
-                            JSONObject site = new JSONObject();
-                            site.put("site", "twitch");
-                            site.put("link", rs.getString("twitch"));
-                            social.add(site);
-                        }
-                        /*if (!rs.getString("steam").equals("")) {
-                            JSONObject site = new JSONObject();
-                            site.put("site", "steam");
-                            site.put("link", rs.getString("steam"));
-                            social.add(site);
-                        }*/
-                        if (!rs.getString("duel_links").equals("")) {
-                            JSONObject site = new JSONObject();
-                            site.put("site", "duel_links");
-                            site.put("link", rs.getString("duel_links"));
-                            social.add(site);
-                        }
                         profile_txt = rs.getString("profile_txt");
-                        profile_txt = replaceReturns(profile_txt);
-                        views = rs.getInt("profile_views");
-                        html = rs.getInt("use_html_text");
-                        gender = rs.getString("gender");
-                        orientation = rs.getString("orientation");
-                        languages = rs.getString("languages");
-                        match_rating = rs.getInt("match_rating");
-                        match_experience = rs.getInt("match_experience");
-                        single_rating = rs.getInt("single_rating");
-                        single_experience = rs.getInt("single_experience");
-                        match_wins = rs.getInt("match_wins");
-                        single_wins = rs.getInt("single_wins");
-                        match_losses = rs.getInt("match_losses");
-                        single_losses = rs.getInt("single_losses");
-                        match_draws = rs.getInt("match_draws");
-                        single_draws = rs.getInt("single_draws");
-
-                        allow_comments = rs.getInt("allow_comments");
-                        allow_comments_friends_only = rs.getInt("allow_comments_friends_only");
-                        require_comment_approval = rs.getInt("require_comment_approval");
-                        message_friends_only = rs.getInt("message_friends_only");
-                        show_location = rs.getInt("show_location");
-                        show_distance = rs.getInt("show_distance");
-                        if (rs.getString("distance") == null) {
-                            show_distance = 0;
-                        }
+                        /* ... */
                     }
                     else {
                         errorE(nbc, username + " is not a registered user");
@@ -4278,7 +3790,6 @@ public class DataHandler {
             result.put("social", social);
             result.put("profile_txt", profile_txt);
             result.put("html", html);
-            //result.put("views", views);
             result.put("views", NumberFormat.getIntegerInstance().format(views));
             result.put("song", song);
             result.put("gender", gender);
@@ -4314,32 +3825,6 @@ public class DataHandler {
             result.put("duel", duel_id);
             result.put("password", watch_password);
             write(nbc, result);
-            
-            // UPDATE VIEWS
-            if (user.previous_views.indexOf(username) >= 10) {
-                user.previous_views.remove(username);
-            }
-            if (!user.previous_views.contains(username)) {
-                if (!user.lastViewedProfile.equals(username)) {
-                    System.out.println("We ARE incrementing the views");
-                    if (!username.equals(user.username)) {
-                        try {
-                            user.previous_views.add(username);
-                            if (person != null) {
-                                person.views++;
-                            }
-                            String query = "UPDATE duelingbook_user SET profile_views = profile_views + 1 WHERE id = " + user_id;
-                            Statement st = getConnection().createStatement();
-                            int numRowsChanged = executeUpdate(st, query);
-                            st.close();
-                        }
-                        catch (Exception e) {
-                            System.err.println(e.getMessage());
-                        }
-                    }
-                }
-                user.lastViewedProfile = username;
-            }
         }
         catch (Exception e) {
             System.err.println(e.getMessage());
@@ -4846,30 +4331,6 @@ public class DataHandler {
             while (rs.next()) {
                 GoatFormatCards.add(rs.getString("treated_as"));
                 GoatFormatLimits.add(rs.getInt("restriction"));
-            }
-            st.close();
-        }
-        catch (Exception e) {
-            System.err.println(e.getMessage());
-        }
-        DuelLinksCards = new ArrayList<String>();
-        DuelLinksLimits = new ArrayList<Integer>();
-        try {
-            String query = "SELECT name, card_limit, SUM(amount) AS amount FROM duel_links GROUP BY name ORDER BY name";
-            Statement st = getConnection().createStatement();     
-            ResultSet rs = executeQuery(st, query);
-            while (rs.next()) {
-                DuelLinksCards.add(rs.getString("name"));
-                if (rs.getInt("card_limit") < 3) {
-                    DuelLinksLimits.add(rs.getInt("card_limit"));
-                }
-                else {
-                    int amount = rs.getInt("amount");
-                    if (amount > 3) {
-                        amount = 3;
-                    }
-                    DuelLinksLimits.add(amount);
-                }
             }
             st.close();
         }
@@ -5464,7 +4925,6 @@ public class DataHandler {
                     i = 0;
                 }
             }
-            TotalDuels++;
             p1.duel_id = duel_id;
             p2.duel_id = duel_id;
             
@@ -7768,11 +7228,6 @@ public class DataHandler {
             log.put("type", "game");
             log.put("public_log", public_entry);
             log.put("private_log", private_entry);
-            
-            if (duel.replay_arr.get(duel.replay_arr.size() - 1).get("play").equals("Pick first")) {
-                InfoLog += "Line 19814 entered in duel #" + duel.id + "\n";
-                return; // added 7/28
-            }
             
             duel.addLog(log);
             player1_log.add(log);
@@ -10480,14 +9935,6 @@ public class DataHandler {
             result.put("card", card.data);
             String public_entry = "Activated Field Spell \"" + card.name + "\" from hand " + location[1];
             publicDuelResult(result, duel, public_entry, you, opp);
-            if (!card.type.equals("Field")) {
-                CardError = user.username + " activated " + card.name + " in the field spell zone in duel #" + duel.id + ". The card id is " + card.id + ". The possible field spells are ";
-                for (int i = 0; i < you.all_cards_arr.size(); i++) {
-                    if (you.all_cards_arr.get(i).type.equals("Field")) {
-                        CardError += you.all_cards_arr.get(i).name + " (" + you.all_cards_arr.get(i).id + "), ";
-                    }
-                }
-            }
         }
         catch (Exception e) {
             System.err.println(e.getMessage());
@@ -10581,14 +10028,6 @@ public class DataHandler {
             //String public_entry = "Activated Set \"" + card.name + "\" in " + location[2];
             String public_entry = "Activated set Field Spell \"" + card.name + "\"";
             publicDuelResult(result, duel, public_entry, you, opp);
-            if (!card.type.equals("Field")) {
-                CardError = user.username + " activated " + card.name + " in the field spell zone. The card id is " + card.id + ". The possible field spells are ";
-                for (int i = 0; i < you.all_cards_arr.size(); i++) {
-                    if (you.all_cards_arr.get(i).type.equals("Field")) {
-                        CardError += you.all_cards_arr.get(i).name + " (" + you.all_cards_arr.get(i).id + "), ";
-                    }
-                }
-            }
         }
         catch (Exception e) {
             System.err.println(e.getMessage());
@@ -11466,7 +10905,7 @@ public class DataHandler {
             duel.call = call;
             duel.awaiting_admin = true;
             Calls.add(duel.call);
-            TotalCalls++;
+            
             JSONObject result = new JSONObject();
             result.put("play", "Call admin");
             result.put("username", user.username);
@@ -11510,7 +10949,6 @@ public class DataHandler {
                 result.put("caller", call.caller);
                 result.put("log", call.opponent);
                 result.put("issue", call.issue);
-                result.put("total", TotalCalls);
                 bw.write(result.toString());
                 bw.flush();
             }
@@ -13597,7 +13035,6 @@ public class DataHandler {
             System.out.println("Getting recycled duel");
             return duel;
         }
-        TotalDuelObjects++;
         return new Duel();
     }
     
@@ -13605,7 +13042,6 @@ public class DataHandler {
         if (RecycledPlayers.size() > 0) {
             return RecycledPlayers.remove(0);
         }
-        TotalPlayers++;
         return new Player();
     }
     
@@ -13615,7 +13051,6 @@ public class DataHandler {
             message.init();
             return message;
         }
-        TotalMessages++;
         return new Message();
     }
     
@@ -13625,7 +13060,6 @@ public class DataHandler {
             de.init();
             return de;
         }
-        TotalDuelEntries++;
         return new DuelEntry();
     }
     
@@ -13633,7 +13067,6 @@ public class DataHandler {
         if (RecycledWatchers.size() > 0) {
             return RecycledWatchers.remove(0);
         }
-        TotalWatchers++;
         return new Watcher();
     }
     
@@ -13661,9 +13094,6 @@ public class DataHandler {
     public static void lostConnection(ChannelHandlerContext nbc, User user, Boolean do_write) {
         try {
             System.out.println("lostConnection entered for " + user.username);
-            if (ReportingLostConnections == true) {
-                InfoLog += user.username + " has lost connection\n";
-            }
             user.times_lost_connection++;
             user.lost_connection = true;
             user.lost_connection_timestamp = new Timestamp(System.currentTimeMillis());
@@ -14162,7 +13592,6 @@ public class DataHandler {
             user.init();
             return user;
         }
-        TotalUsers++;
         return new User();
     }
     
@@ -14198,36 +13627,7 @@ public class DataHandler {
         str = str.replaceAll(">", "&gt;");
         str = str.replaceAll("\"", "&quot;");
         return str;
-    }
-    
-    public static String deAccent(String str) {
-        String nfdNormalizedString = Normalizer.normalize(str, Normalizer.Form.NFD); 
-        return NormailizePattern.matcher(nfdNormalizedString).replaceAll("");
-    }
-    
-    public static Map<String, String> getQueryMap(String query) {  
-        String[] params = query.split("&");  
-        Map<String, String> map = new HashMap<String, String>();  
-        for (String param : params) {  
-            String name = param.split("=")[0];  
-            String value = param.split("=")[1];  
-            map.put(name, value);  
-        }  
-        return map;
-    }  
-    
-    public static void cautionE(ChannelHandlerContext nbc, JSONObject data, User user) {
-        try {
-            if (user.moderator < 1) {
-                invalidRequest(nbc);
-                return;
-            }
-            caution = false;
-        }
-        catch (Exception e) {
-            System.err.println(e.getMessage());
-        }
-    }
+    } 
     
     public static void toggleRated(ChannelHandlerContext nbc, JSONObject data, User user) {
         try {
@@ -14338,10 +13738,6 @@ public class DataHandler {
             String username = (String) data.get("username");
             String link = (String) data.get("link");
             JSONObject result = new JSONObject();
-            if (username.equals("Duelingbook")) {
-                InfoLog += user.username + "'s screenshot: " + link + "\n";
-                return;
-            }
             User person = getUser(username);
             if (person != null) {
                 if (person.admin < 1 && person.moderator < 1 && person.adjudicator < 1) {
@@ -14494,19 +13890,12 @@ public class DataHandler {
     }
     
     public static Connection getConnection() {
-        QPS++;
-        ConnectionIndex++;
-        if (ConnectionIndex >= Connections.size()) {
-            ConnectionIndex = 0;
-        }
-        return Connections.get(ConnectionIndex);
+        return Connections.get(0);
     }
     
     public static ResultSet executeQuery(Statement st, String query) {
         try {
-            if (ReportingQueries == true) {
-                System.out.println("query = " + query);
-            }
+            System.out.println("query = " + query);
             return st.executeQuery(query);
         }
         catch(Exception e) {
@@ -14517,9 +13906,7 @@ public class DataHandler {
     
     public static int executeUpdate(Statement st, String query) {
         try {
-            if (ReportingQueries == true) {
-                System.out.println("query = " + query);
-            }
+            System.out.println("query = " + query);
             return st.executeUpdate(query);
         }
         catch(Exception e) {

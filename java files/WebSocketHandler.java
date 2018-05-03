@@ -20,9 +20,7 @@ public class WebSocketHandler extends ChannelInboundHandlerAdapter {
             }
             else if (msg instanceof TextWebSocketFrame) {
                 String dataString = ((TextWebSocketFrame) msg).text();
-                if (DataHandler.ReportingActions == true) {
-                    System.out.println("websocket dataString = " + dataString);
-                }
+                System.out.println("websocket dataString = " + dataString);
                 NettyServerHandler.startData(ctx, dataString, null);
             }
             else if (msg instanceof PingWebSocketFrame) {

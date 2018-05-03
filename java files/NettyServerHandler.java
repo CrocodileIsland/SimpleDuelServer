@@ -24,9 +24,6 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
             dataString = in.toString(io.netty.util.CharsetUtil.US_ASCII);
             Matcher matcher = DataHandler.ASCIIPattern.matcher(dataString);
             if (!matcher.find()) {
-                if (DataHandler.ReportingLostConnections == true) {
-                    System.out.println("SSL connection opened");
-                }
                 if (Main.local == true || dataString.indexOf("www.duelingbook.com") >= 0) {
                     nbc.pipeline().addLast("cloudflareHandler", new CloudflareHandler());
                     nbc.pipeline().replace(this, "sslHandler", Main.SelfSignedSSLContext.newHandler(nbc.channel().alloc()));
@@ -51,9 +48,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
                     nbc.pipeline().addLast("flashHandler", new FlashHandler());
                 }
             }
-            if (DataHandler.ReportingActions == true) {
-                System.out.println("dataString = " + dataString);
-            }
+            System.out.println("dataString = " + dataString);
             if (dataString.indexOf("<policy-file-request/>") == 0) {
                 DataHandler.write(nbc, DataHandler.Policy);
                 return;
