@@ -1503,12 +1503,6 @@ public class DataHandler {
                 judge = 1;
                 receiver_judge = 1;
             }
-            
-            if (sender.equals("life after death") && receiver.equals("XtevensChannel")) {
-                if (message.indexOf("........") >= 0) {
-                    return;
-                }
-            }
             if (user.admin > 0 && message.toLowerCase().indexOf("block ") == 0) {
                 message = "I'm sorry he's bothering you. If you visit his profile you will be able to block him from contacting you.";
             }
@@ -1516,11 +1510,6 @@ public class DataHandler {
             int i = 0;
             User person = null;
             JSONObject result = new JSONObject();
-            /*Matcher matcher = ASCIIPattern.matcher(message);
-            if (!matcher.find()) {
-                invalidRequest(nbc);
-                return;
-            }*/
             // FIND THE RECEIVER
             if (receiver.equalsIgnoreCase(user.username) || receiver.equalsIgnoreCase(user.user_username)) {
                 result.put("action", "Private chat error");
