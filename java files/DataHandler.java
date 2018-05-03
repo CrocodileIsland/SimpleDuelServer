@@ -27,7 +27,6 @@ public class DataHandler {
     public static ArrayList<Duel> RecycledDuels = new ArrayList<Duel>();
     public static ArrayList<Player> RecycledPlayers = new ArrayList<Player>();
     public static ArrayList<Message> RecycledMessages = new ArrayList<Message>();
-    public static ArrayList<DuelEntry> RecycledDuelEntries = new ArrayList<DuelEntry>();
     public static ArrayList<Watcher> RecycledWatchers = new ArrayList<Watcher>();
     public static ArrayList<User> DuelRoom = new ArrayList<User>();
     public static ArrayList<Call> Calls = new ArrayList<Call>();
@@ -39,7 +38,6 @@ public class DataHandler {
     public static ArrayList<Message> PublicMessages = new ArrayList<Message>();
     public static ArrayList<Message> WatchMessages = new ArrayList<Message>();
     public static ArrayList<Message> PrivateMessages = new ArrayList<Message>();
-    public static ArrayList<DuelEntry> DuelEntries = new ArrayList<DuelEntry>();
     public static Timer messagesTimer;
     public static TimerTask messagesTimerTask;
     public static int messageSeconds = 0;
@@ -1096,16 +1094,6 @@ public class DataHandler {
         arr.clear();
     }
     
-    public static void recycleDuelEntries(ArrayList<DuelEntry> arr) {
-        if (arr == null) {
-            return;
-        }
-        for (int i = 0; i < arr.size(); i++) {
-            RecycledDuelEntries.add(arr.get(i));
-        }
-        arr.clear();
-    }
-    
     public static void recycleWatcher(Watcher watcher) {
         watcher.init();
         RecycledWatchers.add(watcher);
@@ -1371,7 +1359,6 @@ public class DataHandler {
         obj.put("serial_number", card.serial_number);
         obj.put("tcg", card.tcg);
         obj.put("ocg", card.ocg);
-        //obj.put("pic", "1");
         obj.put("pic", card.pic);
         if (!obj.has("atk")) {
             if (obj.get("card_type").equals("Monster")) {
@@ -11176,43 +11163,6 @@ public class DataHandler {
         if (duel.draw == true) {
             draw = 1;
         }
-        if (UpdatingRatings == true) {
-            addToDuelEntries(duel.id, duel.language, duel.rules, duel.type, duel.format, rated, duel.player1.user_id, duel.player1.username, duel.player2.user_id, duel.player2.username, winner_id, draw, duel.player1.deck_id, duel.player2.deck_id, duel.player1.prev_rating, duel.player1.rating, duel.player1.prev_experience, duel.player2.prev_rating, duel.player2.rating, duel.player2.prev_experience, duel.player1.experience, duel.player2.experience, duel.player1.points, duel.player2.points, duel.startTimestamp, duel.endTimestamp, duel.player1.key, duel.player2.key);
-        }
-    }
-    
-    public static void addToDuelEntries(int duel_id, String language, String rules, String type, String format, int rated, int player1_id, String player1_username, int player2_id, String player2_username, int winner_id, int draw, int host_deck, int opp_deck, int host_prev_rating, int host_new_rating, int host_prev_exp, int opp_prev_rating, int opp_new_rating, int opp_prev_exp, int host_new_exp, int opp_new_exp, int player1_points, int player2_points, Timestamp startTimestamp, Timestamp endTimestamp, String host_key, String opp_key) {
-        System.out.println("addToDuelEntries entered");
-        DuelEntry entry = newDuelEntry();
-        entry.duel_id = duel_id;
-        entry.language = language;
-        entry.rules = rules;
-        entry.type = type;
-        entry.format = format;
-        entry.rated = rated;
-        entry.player1_id = player1_id;
-        entry.player1_username = player1_username;
-        entry.player2_id = player2_id;
-        entry.player2_username = player2_username;
-        entry.winner_id = winner_id;
-        entry.draw = draw;
-        entry.host_deck = host_deck;
-        entry.opp_deck = opp_deck;
-        entry.host_prev_rating = host_prev_rating;
-        entry.host_new_rating = host_new_rating;
-        entry.host_prev_exp = host_prev_exp;
-        entry.host_new_exp = host_new_exp;
-        entry.opp_prev_rating = opp_prev_rating;
-        entry.opp_new_rating = opp_new_rating;
-        entry.opp_prev_exp = opp_prev_exp;
-        entry.opp_new_exp = opp_new_exp;
-        entry.player1_points = player1_points;
-        entry.player2_points = player2_points;
-        entry.startTimestamp = startTimestamp;
-        entry.endTimestamp = endTimestamp;
-        entry.host_key = host_key;
-        entry.opp_key = opp_key;
-        DuelEntries.add(entry);
     }
     
     public static void beginSiding(Duel duel) {
@@ -12959,15 +12909,6 @@ public class DataHandler {
             return message;
         }
         return new Message();
-    }
-    
-    public static DuelEntry newDuelEntry() {
-        if (RecycledDuelEntries.size() > 0) {
-            DuelEntry de = RecycledDuelEntries.remove(0);
-            de.init();
-            return de;
-        }
-        return new DuelEntry();
     }
     
     public static Watcher newWatcher() {
