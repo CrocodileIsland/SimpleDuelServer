@@ -58,7 +58,7 @@ public class DataHandler {
     public static ArrayList<Message> WatchMessages = new ArrayList<Message>();
     public static ArrayList<Message> GroupMessages = new ArrayList<Message>();
     public static ArrayList<Message> PrivateMessages = new ArrayList<Message>();
-    public static ArrayList<AdminAction> AdminActions = new ArrayList<AdminAction>();
+    //public static ArrayList<AdminAction> AdminActions = new ArrayList<AdminAction>();
     //public static ArrayList<Status> StatusUpdatesQueue = new ArrayList<Status>();
     //public static ArrayList<JournalEntry> JournalEntries = new ArrayList<JournalEntry>();
     public static ArrayList<DuelEntry> DuelEntries = new ArrayList<DuelEntry>();
