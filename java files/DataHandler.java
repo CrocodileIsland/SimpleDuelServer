@@ -662,10 +662,10 @@ public class DataHandler {
                             break;
                         case "Repair status updates":
                             repairStatusUpdates(nbc, data, user);
-                            break;*/
+                            break;
                         case "Get actions":
                             getActions(nbc, data, user);
-                            break;
+                            break;*/
                         case "Get screenshot":
                             getScreenshot(nbc, data, user);
                             break;
@@ -757,12 +757,10 @@ public class DataHandler {
                     }
                 }
                 catch (Exception ex) {
-                    System.out.println("*************** General Exception *************** on line 1312");
                     System.out.println(ex.getMessage());
-                    System.out.println("data.toString() = " + data.toString());
                 }
            }
-        }).start(); // undisabled 10/27, redisabled 11/13
+        }).start();
     }
     
     public static void heartbeat(ChannelHandlerContext nbc, JSONObject data, User user) {
@@ -779,10 +777,6 @@ public class DataHandler {
     public static void getDuelingbookUser(User user, JSONObject data) {
         String username = (String) data.get("username");
         Boolean administrate = (Boolean) data.get("administrate");
-        int remember_me = (int) data.get("remember_me");
-        if (remember_me == 1) {
-            remember_me = 2;
-        }
         JSONObject result = new JSONObject();
         try {
             System.out.println("Loading duelingbook_user for " + username);
@@ -816,24 +810,7 @@ public class DataHandler {
             finishLogin(user, data);
             return;
         }
-        System.out.println("Loading decks for " + user.username);
-        user.log += "Loading decks at " + new Timestamp(System.currentTimeMillis()) + "\n";
-        user.deck_millis = System.currentTimeMillis();
         user.decks = loadDecklists(user.id, user.default_deck);
-        user.deck_millis = System.currentTimeMillis() - user.deck_millis;
-        user.deck_status = "No decks";
-        if (user.decks.size() > 0) {
-            user.deck_status = "Error";
-        }
-        for (int i = 0; i < user.decks.size(); i++) {
-            if (user.decks.get(i).get("name").equals(user.default_deck)) {
-                user.deck_status = "Good";
-                break;
-            }
-        }
-        if (user.deck_status.equals("Error")) {
-            user.deck_status += ": default_deck = " + user.default_deck + ", decks = " + user.decks;
-        }
         user.decks_loaded = true;
         finishLogin(user, data);
     }
@@ -849,7 +826,6 @@ public class DataHandler {
         user.connecting = false;
         user.online = true;
         
-        String freeze_id = user.nbc_address.replaceAll("\\.", "_");
         ArrayList<JSONObject> allGroups = new ArrayList<JSONObject>();
         String message = "";
         int days = 0;
@@ -932,7 +908,6 @@ public class DataHandler {
         result.put("allGroups", allGroups);
         result.put("pic", user.pic);
         result.put("decks", user.decks);
-        //result.put("user_agent", user.user_agent);
         result.put("loginDate", loginDate);
         result.put("times_online", user.times_online);
         result.put("total_wins", user.single_wins + user.match_wins);
@@ -940,9 +915,6 @@ public class DataHandler {
         result.put("users", users);
         result.put("tag", user.tag);
         result.put("checking_decks", true);
-        if (user.announcement.size() > 0) {
-            result.put("announcement", user.announcement);
-        }
         if (user.admin > 0) {
             ArrayList<JSONObject> calls = new ArrayList<JSONObject>();
             for (int i = 0; i < Calls.size(); i++) {
@@ -954,9 +926,6 @@ public class DataHandler {
                 calls.add(call);
             }
             result.put("calls", calls);
-        }
-        if (user.beginner == 1 || user.frozen == true || InsertingMessages == false) {
-            result.put("message", message);
         }
         user.connect_timestamp = new Timestamp(System.currentTimeMillis());
         user.connecting_millis = System.currentTimeMillis() - user.connecting_millis;
@@ -994,10 +963,6 @@ public class DataHandler {
             Boolean administrate = (Boolean) data.get("administrate");
             int version = (int) data.get("version");
             String capabilities = (String) data.get("capabilities");
-            int remember_me = (int) data.get("remember_me");
-            if (remember_me == 1) {
-                remember_me = 2;
-            }
             long connect_time = 0;
             if (data.has("connect_time")) {
                 connect_time = Long.valueOf((int) data.get("connect_time"));
