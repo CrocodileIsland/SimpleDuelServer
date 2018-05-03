@@ -149,11 +149,6 @@ public class DataHandler {
         try {
             User user = null;
             JSONObject result = new JSONObject();
-            Matcher matcher = ASCIIPattern.matcher(data.toString());
-            if (!matcher.find()) {
-                errorE(nbc, "Special characters were detected. Your request did not go through.");
-                return;
-            }
             for (int i = 0; i < Users.size(); i++) {
                 if (Users.get(i).nbc != null) {
                     if (Users.get(i).nbc.equals(nbc)) {
@@ -166,30 +161,10 @@ public class DataHandler {
                 }
             }
             String action = (String) data.get("action");
-            if (user != null) {
-                if (user.banned == true) {
-                    result = new JSONObject();
-                    result.put("action", "Banned");
-                    write(nbc, result);
-                    return;
-                }
-            }
             switch(action) {
                 case "Connect":
                     connect(nbc, data);
                     return;
-            }
-            if (user == null) {
-                if (action.equals("Activate") || action.equals("Deactivate")) {
-                    return;
-                }
-                result = new JSONObject();
-                result.put("action", "Rejected");
-                result.put("message", "User is null");
-                write(nbc, result);
-                return;
-            }
-            switch (action) {
                 case "Join pool":
                     joinPool(nbc, data, user);
                     return;
