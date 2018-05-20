@@ -41,6 +41,20 @@ public class Main {
     public void run() throws Exception {
         SelfSignedCertificate ssc = new SelfSignedCertificate();
         SelfSignedSSLContext = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
+        if (System.getProperty("user.dir").indexOf("/Users/") != 0) { 
+        	// This means the process is running on the website and not on my local computer
+            TrustManagerFactory tmFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            KeyStore tmpKS = null;
+            tmFactory.init(tmpKS);
+            KeyStore ks = KeyStore.getInstance("JKS");
+            ks.load(new FileInputStream(KEYSTORE_PATH), KEYSTORE_PASSWORD.toCharArray());
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            kmf.init(ks, KEYSTORE_PASSWORD.toCharArray());
+            KeyManager[] km = kmf.getKeyManagers();
+            TrustManager[] tm = tmFactory.getTrustManagers();
+            DuelSSLContext = SSLContext.getInstance("TLS");
+            DuelSSLContext.init(km, tm, null);
+        }
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
@@ -65,9 +79,14 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
+        if (System.getProperty("user.dir").indexOf("/Users/") != 0) {
+            local = false;
+        }
         try {
             String content = new String (Files.readAllBytes(Paths.get("config.txt")));
             JSONObject data = new JSONObject(content);
+            KEYSTORE_PATH = (String) data.get("KEYSTORE_PATH");
+            KEYSTORE_PASSWORD = (String) data.get("KEYSTORE_PASSWORD");
             DataHandler.DB_URL = (String) data.get("DB_URL");
             DataHandler.DB_DATABASE = (String) data.get("DB_DATABASE");
             DataHandler.DB_USERNAME = (String) data.get("DB_USERNAME");
